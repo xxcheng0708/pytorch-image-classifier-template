@@ -165,7 +165,7 @@ model, _, _ = backbone.build_model()
 model.load_state_dict(torch.load(best_model))
 model = model.cuda()
 model.eval()
-test_acc, test_loss = evaluate_accuracy_and_loss(test_data_loader, model, loss, epoch="test", classes, save_dir,
+test_acc, test_loss = evaluate_accuracy_and_loss(test_data_loader, model, loss, "test", classes, save_dir,
                                                  error_analysis=True, stage="val")
 print("test accuracy: {}, test loss: {}".format(test_acc, test_loss))
 
