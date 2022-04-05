@@ -43,7 +43,7 @@ This code modifies the output layer of image classification network commonly use
 </table>
 
 # Blog
-* [从零搭建音乐识别系统（一）整体功能介绍](https://blog.csdn.net/cxx654/article/details/118254718?spm=1001.2014.3001.5501)
+* [here](https://blog.csdn.net/cxx654/article/details/118254718?spm=1001.2014.3001.5501)
 
 # Usage
 * modify data/classifier.yaml
