@@ -74,6 +74,11 @@ class ZeroMeanNormalize(object):
         return x
 
 
+class ZeroOneNormalize(object):
+    def __call__(self, img):
+        return img.float().div(255)
+
+
 class AddSaltPepperNoise(object):
     def __init__(self, density=0, p=0.5):
         self.density = density

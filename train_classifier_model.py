@@ -10,6 +10,7 @@ from utils.data_loader import fetch_dataloader
 from utils.metric import failure_analysis, evaluate_accuracy_and_loss
 from utils import transforms
 import warnings
+import shutil
 
 warnings.filterwarnings("ignore")
 
@@ -76,7 +77,7 @@ test_data_loader = data_loader["test_loader"]
 print(classes)
 print("train: {}, val: {}, test: {}".format(len(train_data_loader), len(val_data_loader), len(test_data_loader)))
 
-backbone = Backbone(out_dimension=len(classes), model_name=networkx, pretrained=True)
+backbone = Backbone(out_dimension=len(classes), model_name=model_name, pretrained=True)
 model, train_params, pretrained_params = backbone.build_model()
 optimizer = torch.optim.SGD(
     [
@@ -126,14 +127,16 @@ def train(model, train_iter, val_iter, loss, num_epoches, optimizer):
             train_acc_sum += (y_pred.argmax(dim=1) == y).sum().item()
             n += y.shape[0]
 
-            if batch_idx % 20 == 0:
-                print("epoch: {}, iter: {}, lter loss: {:.4f}, iter acc: {:.4f}".format(epoch, batch_idx, l.item(), (
-                        y_pred.argmax(dim=1) == y).float().mean().item()))
+            # if batch_idx % 20 == 0:
+            #     print("epoch: {}, iter: {}, lter loss: {:.4f}, iter acc: {:.4f}".format(epoch, batch_idx, l.item(), (
+            #             y_pred.argmax(dim=1) == y).float().mean().item()))
         lr_scheduler.step()
         model.eval()
 
-        t_acc, t_loss = evaluate_accuracy_and_loss(train_iter, model, loss, epoch, error_analysis=True, stage="train")
-        v_acc, v_loss = evaluate_accuracy_and_loss(val_iter, model, loss, epoch, error_analysis=True, stage="val")
+        # t_acc, t_loss = evaluate_accuracy_and_loss(train_iter, model, loss, epoch, classes, save_dir,
+        #                                            error_analysis=True, stage="train")
+        v_acc, v_loss = evaluate_accuracy_and_loss(val_iter, model, loss, epoch, classes, save_dir,
+                                                   error_analysis=True, stage="val")
         train_acc.append(train_acc_sum / n)
         train_loss.append(train_loss_sum / n)
         # train_acc.append(t_acc)
@@ -144,14 +147,16 @@ def train(model, train_iter, val_iter, loss, num_epoches, optimizer):
         print("epoch: {}, train acc: {:.4f}, train loss: {:.4f}, val acc: {:.4f}, val loss: {:.4f}".format(
             epoch, train_acc[-1], train_loss[-1], val_acc[-1], val_loss[-1]))
         if v_acc > best_acc:
-            if os.path.exists(save_dir) is False:
-                os.makedirs(save_dir)
+            if os.path.exists(os.path.join(save_dir, model_name)) is False:
+                os.makedirs(os.path.join(save_dir, model_name))
             best_acc = v_acc
-            best_model = os.path.join(save_dir, "model-{}-{}-{}.pth".format(model_name, epoch, best_acc))
+            best_model = os.path.join(os.path.join(save_dir, model_name), "model-{}-{}-{}.pth".format(model_name, epoch, best_acc))
             torch.save(model.module.state_dict(), best_model)
     return train_acc, train_loss, val_acc, val_loss, lr_decay_list, best_model, best_acc
 
 
+if os.path.exists(os.path.join(save_dir, "failure_examples")):
+    shutil.rmtree(os.path.join(save_dir, "failure_examples"))
 train_acc, train_loss, val_acc, val_loss, lr_decay_list, best_model, best_acc = train(
     model, train_iter, val_iter, loss, num_epoches, optimizer)
 print("best model: {}, best accuracy: {}".format(best_model, best_acc))
@@ -160,8 +165,8 @@ model, _, _ = backbone.build_model()
 model.load_state_dict(torch.load(best_model))
 model = model.cuda()
 model.eval()
-test_acc, test_loss = evaluate_accuracy_and_loss(test_data_loader, model, loss,
-                                                 epoch="test", error_analysis=True, stage="val")
+test_acc, test_loss = evaluate_accuracy_and_loss(test_data_loader, model, loss, epoch="test", classes, save_dir,
+                                                 error_analysis=True, stage="val")
 print("test accuracy: {}, test loss: {}".format(test_acc, test_loss))
 
 fig, axes = plt.subplots(1, 3)

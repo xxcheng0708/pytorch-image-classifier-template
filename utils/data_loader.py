@@ -44,7 +44,7 @@ def fetch_dataloader(dataset_dir, ratio, train_transforms, val_transforms, train
                      batchsize=512, num_workers=8, seed=100):
     random.seed(seed)
 
-    dataset = torchvision.datasets.DatasetFolder(dataset_dir, loader=np.load, extensions=("npy",))
+    dataset = torchvision.datasets.ImageFolder(dataset_dir)
     classes = dataset.classes
     character = [[] for _ in range(len(classes))]
     random.shuffle(dataset.samples)
