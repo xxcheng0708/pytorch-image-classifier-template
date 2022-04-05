@@ -3,7 +3,7 @@ dataset_dir: ""
 save_dir: "./results"
 train_size: {"0": 5000, "1": 5000}
 device: [0, 1, 2, 3]
-batch_size: 512
+batch_size: 256
 # split train/val/test
 train_ratio: 0.7
 val_ratio: 0.2

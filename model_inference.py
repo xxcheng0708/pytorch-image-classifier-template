@@ -15,7 +15,7 @@ model_path = ""
 
 val_transforms_list = [
     torchvision.transforms.Resize(size=(224, 224)),
-    transforms.ZeroMeanNormalize()
+    transforms.ZeroOneNormalize()
 ]
 val_transforms = torchvision.transforms.Compose(val_transforms_list)
 
@@ -38,7 +38,7 @@ with torch.no_grad():
         img = val_transforms(img).to(device)
 
         res = model(img)
-        cls_index = res_argmax(dim=1)
+        cls_index = res.argmax(dim=1)
         cls_prob = nn.functional.softmax(res, dim=1)
 
         pred_prob = cls_prob[0][cls_index].item()
