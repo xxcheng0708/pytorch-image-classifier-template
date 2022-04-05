@@ -1,5 +1,6 @@
 # coding:utf-8
 from torchvision.io import read_image
+from torchvision.io.image import ImageReadMode
 import numpy as np
 import random
 import torchvision
@@ -35,7 +36,7 @@ class ImageDataset(Dataset):
         return len(self.filenames)
 
     def __getitem__(self, idx):
-        image = read_image(self.filenames[idx])
+        image = read_image(self.filenames[idx], mode=ImageReadMode.RGB)
         image = self.transforms(image)
         return image, self.labels[idx]
 
