@@ -58,11 +58,13 @@ train_transforms_list = [
     torchvision.transforms.RandomHorizontalFlip(p=left_right_flip),
     torchvision.transforms.RandomVerticalFlip(p=up_down_flip),
     torchvision.transforms.RandomRotation(degrees=rotate_degree),
-    transforms.ZeroOneNormalize()
+    transforms.ZeroOneNormalize(),
+    torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ]
 val_transforms_list = [
     torchvision.transforms.Resize(size=(224, 224)),
-    transforms.ZeroOneNormalize()
+    transforms.ZeroOneNormalize(),
+    torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ]
 
 train_transforms = torchvision.transforms.Compose(train_transforms_list)
